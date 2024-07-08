@@ -40,13 +40,15 @@ if __name__ == '__main__':
     # df.to_csv('data/journals_results_filtered.csv', index=False)
     
     df_output = pd.DataFrame(columns=['PMID', 'Date', 'Title', 'Authors', 'Affiliation', 'Mail', 'Journal'])
-    for index, row in tqdm(df.iterrows()):
+    rows = list(df.iterrows())
+    for index, row in tqdm(rows[0:10]):
         data = row.to_dict()
         
         for jn in info_j:
             if data['PMID'] in jn['additional_info']:
                 data['Journal'] = jn['name']
-                df_output = df_output.append(data, ignore_index=True)
+                temp_df = pd.DataFrame(data, index=[0])
+                df_output = df.concat(df_output, temp_df)                
                 break 
     
     df_output.to_csv('data/journals_results_names.csv', index=False)    
