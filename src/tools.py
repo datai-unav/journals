@@ -55,6 +55,12 @@ if __name__ == '__main__':
     # Load a dataframe in csv file with headers
     df = pd.read_csv('data/journals_results_filtered.csv')
 
+
+    mails = pd.read_csv('data\mails.csv')
+                
+    print(len(mails['mails'].unique()))
+    
+    
     # Count the unique values in the Mail column, the Mail column is a list
   
 
