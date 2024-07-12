@@ -6,8 +6,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+import os
 
-def load_progress(file_name):
+def load_progress(file_name, journal_name):
     """
     Load progress data from a pickle file.
 
@@ -18,12 +19,15 @@ def load_progress(file_name):
     - dict or None: Loaded progress data or None if file not found.
     """
     try:
-        with open(file_name, 'rb') as f:
-            return pickle.load(f)
+        if not os.path.exists(f'data/journals/{journal_name}/{file_name}'):
+            return None
+        else:
+            with open(f'data/journals/{journal_name}/{file_name}', 'rb') as f:
+                return pickle.load(f)
     except FileNotFoundError:
         return None
 
-def save_progress(progress, file_name):
+def save_progress(progress, file_name, journal_name):
     """
     Save progress data to a pickle file.
 
@@ -34,10 +38,10 @@ def save_progress(progress, file_name):
     Returns:
     - None
     """
-    with open(file_name, 'wb') as f:
+    with open(f'data/journals/{journal_name}/{file_name}', 'wb') as f:
         pickle.dump(progress, f)
 
-def save_errors(error_list, file_name):
+def save_errors(error_list, file_name, journal_name):
     """
     Save error list to a pickle file.
 
@@ -48,10 +52,10 @@ def save_errors(error_list, file_name):
     Returns:
     - None
     """
-    with open(file_name, 'wb') as f:
+    with open(f'data/journals/{journal_name}/{file_name}', 'wb') as f:
         pickle.dump(error_list, f)
 
-def load_data(file_name):
+def load_data(file_name, journal_name):
     """
     Load data from a pickle file.
 
@@ -62,12 +66,12 @@ def load_data(file_name):
     - list: Loaded data or an empty list if file not found.
     """
     try:
-        with open(file_name, 'rb') as f:
+        with open(f'data/journals/{journal_name}/{file_name}', 'rb') as f:
             return pickle.load(f)
     except FileNotFoundError:
         return []
 
-def save_data(data, file_name):
+def save_data(data, file_name, journal_name):
     """
     Save data to a pickle file.
 
@@ -78,9 +82,9 @@ def save_data(data, file_name):
     Returns:
     - None
     """
-    current_data = load_data(file_name)
+    current_data = load_data(file_name, journal_name)
     current_data.append(data)
-    with open(file_name, 'wb') as f:
+    with open(f'data/journals/{journal_name}/{file_name}', 'wb') as f:
         pickle.dump(current_data, f)
 
 def process_journal_by_name(journals, journal_name, processed_file, errors_file, data_file, id_num):
@@ -105,13 +109,16 @@ def process_journal_by_name(journals, journal_name, processed_file, errors_file,
     chrome_options.add_argument("--disable-gpu")  # Recommended as per documentation
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model, REQUIRED for Docker. Comment this line if not using Docker
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36")
+   
   
     error_list = []  # List to store IDs with errors
     e = 0 # Counter for progress tracking
     driver = webdriver.Chrome(options=chrome_options)  # Initialize Chrome driver
     start_time = time.time()
-    progress = load_progress(processed_file) # Load progress from file
+    progress = load_progress(processed_file, journal_name) # Load progress from file
+
+   
 
     # Initialize progress if it's None (file not found)
     if progress is None:
@@ -119,12 +126,14 @@ def process_journal_by_name(journals, journal_name, processed_file, errors_file,
     else:
         e = len(progress["processed_nums"]) # Get count of processed IDs
 
+   
     # Find the journal by name in the list of journals
     journal = next((j for j in journals if j.get('name') == journal_name), None)
     if journal is None:
         print(f"Journal '{journal_name}' not found.")
         return
 
+  
     num = int(id_num)
     # Check if ID is already processed
     if num in progress["processed_nums"]:
@@ -135,22 +144,24 @@ def process_journal_by_name(journals, journal_name, processed_file, errors_file,
     print(f'{e}: {url}')
     driver.get(url)
     try:
+        
         WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "article-details")))
         search_results = driver.find_element(By.CLASS_NAME, "article-details").text
         data = {"Journal": journal_name, "Num": num, "Content": search_results}
         
+      
         # Save the data immediately
-        save_data(data, data_file)
+        save_data(data, data_file, journal_name)
         
         e += 1
         progress["processed_nums"].append(num)
-        save_progress(progress, processed_file)
+        save_progress(progress, processed_file, journal_name)
     except Exception as ex:
         print(f"Failed to extract content for article {num} - Journal: {journal_name}: {str(ex)}")
         error_list.append(num)  # Add ID to the error list
 
     # Save errors to file
-    save_errors(error_list, errors_file)
+    save_errors(error_list, errors_file, journal_name)
 
     end_time = time.time()
     total_time = end_time - start_time
@@ -166,6 +177,10 @@ if __name__ == '__main__':
     parser.add_argument('--data_file', type=str, default='info_ids.pkl', help='File name to save article data')
     args = parser.parse_args()
     
+
+    if not os.path.exists(f'data/journals/{args.journal_name}'):
+        os.makedirs(f'data/journals/{args.journal_name}')
+
     # Load the list of journals from the file
     with open('data/info_journals.pkl', 'rb') as f:
         journals = pickle.load(f)
@@ -184,7 +199,7 @@ if __name__ == '__main__':
             process_journal_by_name(journals, args.journal_name, args.processed_file, args.errors_file, args.data_file, id_num)
             
             # Verify the content of the info_ids.pkl after each save
-            saved_data = load_data(args.data_file)
+            saved_data = load_data(args.data_file, args.journal_name)
 
 # cd 'Directorio_donde_se_encuentre_el_archivo'
 # python get_ids_info.py "Aphasiology"
