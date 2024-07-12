@@ -200,6 +200,9 @@ if __name__ == '__main__':
             
             # Verify the content of the info_ids.pkl after each save
             saved_data = load_data(args.data_file, args.journal_name)
+        
+        with open(f'data/journals/{args.journal_name}/finished.txt', 'w') as f:
+            f.write('Finished processing all IDs.')
 
 # cd 'Directorio_donde_se_encuentre_el_archivo'
 # python get_ids_info.py "Aphasiology"
