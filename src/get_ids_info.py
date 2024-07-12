@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
 def load_progress(file_name):
     """
@@ -97,9 +98,18 @@ def process_journal_by_name(journals, journal_name, processed_file, errors_file,
     Returns:
     - None
     """
+
+     # Set Chrome to run headlessly
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Ensure GUI is off
+    chrome_options.add_argument("--disable-gpu")  # Recommended as per documentation
+    chrome_options.add_argument("--no-sandbox")  # Bypass OS security model, REQUIRED for Docker. Comment this line if not using Docker
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+
+  
     error_list = []  # List to store IDs with errors
     e = 0 # Counter for progress tracking
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(options=chrome_options)  # Initialize Chrome driver
     start_time = time.time()
     progress = load_progress(processed_file) # Load progress from file
 
@@ -157,7 +167,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     # Load the list of journals from the file
-    with open('info_journals.pkl', 'rb') as f:
+    with open('data/info_journals.pkl', 'rb') as f:
         journals = pickle.load(f)
     
     # Check if the specified journal name exists in the loaded journal data
