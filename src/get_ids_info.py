@@ -196,6 +196,7 @@ if __name__ == '__main__':
         # Process each ID individually
         for id_num in id_list:
             # Call process_journal_by_name() for each ID
+            time.sleep(2)
             process_journal_by_name(journals, args.journal_name, args.processed_file, args.errors_file, args.data_file, id_num)
             
             # Verify the content of the info_ids.pkl after each save
