@@ -10,8 +10,26 @@ from selenium.webdriver.chrome.options import Options
 if __name__ == '__main__':
     
 
-    data = pickle.load(open(r'data\journals\eLife\elif\info_ids.pkl', 'rb'))
-    print(len(data))
+    #data = pickle.load(open(r'data\journals\eLife\elif\info_ids.pkl', 'rb'))
+    with open(r'data/unique_names.csv', 'r') as file:
+        unique_names = file.readlines()
+        
+    # Split the lines into a 3 .txt files
+    file1 = open(r'data/unique_names1.txt', 'w')
+    file2 = open(r'data/unique_names2.txt', 'w')
+    file3 = open(r'data/unique_names3.txt', 'w')
+    count  = len(unique_names)
+    for i in range(count):
+        if i < count/3:
+            file1.write(unique_names[i])
+        elif i < 2*count/3:
+            file2.write(unique_names[i])
+        else:
+            file3.write(unique_names[i])
+    file1.close()
+    file2.close()
+    file3.close()
+    
     # Load the model
     # with open('info_ids.pkl', 'rb') as file:
     #     model = pickle.load(file)
@@ -24,8 +42,8 @@ if __name__ == '__main__':
     # with open('errors_ids.pkl', 'rb') as file:
     #     errors = pickle.load(file)
     
-    with open(r'data\info_journals.pkl', 'rb') as file:
-        info_j = pickle.load(file)
+    # with open(r'data\info_journals.pkl', 'rb') as file:
+    #     info_j = pickle.load(file)
     
     #Export Unique names from info_journals
     # unique_names = set()
