@@ -178,32 +178,41 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
 
-    if not os.path.exists(f'data/journals/{args.journal_name}'):
-        os.makedirs(f'data/journals/{args.journal_name}')
+    
 
     # Load the list of journals from the file
     with open('data/info_journals.pkl', 'rb') as f:
         journals = pickle.load(f)
     
-    # Check if the specified journal name exists in the loaded journal data
-    if args.journal_name not in [journal['name'] for journal in journals]:
-        print(f"The journal '{args.journal_name}' doesn't exist.")
-    else:
-        # Obtain the list of IDs for the specified journal
-        journal_info = next(journal for journal in journals if journal['name'] == args.journal_name)
-        id_list = journal_info.get('additional_info', [])
+    file_name = str(args.journal_name)
+    
+    with open(f'data/{file_name}', 'r') as names:
+        names_list = names.readlines()
         
-        # Process each ID individually
-        for id_num in id_list:
-            # Call process_journal_by_name() for each ID
-            time.sleep(2)
-            process_journal_by_name(journals, args.journal_name, args.processed_file, args.errors_file, args.data_file, id_num)
+    for name in names_list:
+        
+        if not os.path.exists(f'data/journals/{name}'):
+            os.makedirs(f'data/journals/{name}')
             
-            # Verify the content of the info_ids.pkl after each save
-            saved_data = load_data(args.data_file, args.journal_name)
-        
-        with open(f'data/journals/{args.journal_name}/finished.txt', 'w') as f:
-            f.write('Finished processing all IDs.')
+        # Check if the specified journal name exists in the loaded journal data
+        if name not in [journal['name'] for journal in journals]:
+            print(f"The journal '{name}' doesn't exist.")
+        else:
+            # Obtain the list of IDs for the specified journal
+            journal_info = next(journal for journal in journals if journal['name'] == name)
+            id_list = journal_info.get('additional_info', [])
+            
+            # Process each ID individually
+            for id_num in id_list:
+                # Call process_journal_by_name() for each ID
+                time.sleep(2)
+                process_journal_by_name(journals, name, args.processed_file, args.errors_file, args.data_file, id_num)
+                
+                # Verify the content of the info_ids.pkl after each save
+                saved_data = load_data(args.data_file, name)
+            
+            with open(f'data/journals/{name}/finished.txt', 'w') as f:
+                f.write('Finished processing all IDs.')
 
 # cd 'Directorio_donde_se_encuentre_el_archivo'
 # python get_ids_info.py "Aphasiology"
