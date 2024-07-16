@@ -10,25 +10,42 @@ from selenium.webdriver.chrome.options import Options
 if __name__ == '__main__':
     
 
-    #data = pickle.load(open(r'data\journals\eLife\elif\info_ids.pkl', 'rb'))
-    with open(r'data/unique_names.csv', 'r') as file:
-        unique_names = file.readlines()
+    # Load the list of journals from the file
+    with open('data/info_journals.pkl', 'rb') as f:
+        journals = pickle.load(f)
+    
+    file_name = "unique_names1.txt"
+    
+    with open(f'data/{file_name}', 'r') as names:
+        names_list = names.readlines()
         
-    # Split the lines into a 3 .txt files
-    file1 = open(r'data/unique_names1.txt', 'w')
-    file2 = open(r'data/unique_names2.txt', 'w')
-    file3 = open(r'data/unique_names3.txt', 'w')
-    count  = len(unique_names)
-    for i in range(count):
-        if i < count/3:
-            file1.write(unique_names[i])
-        elif i < 2*count/3:
-            file2.write(unique_names[i])
-        else:
-            file3.write(unique_names[i])
-    file1.close()
-    file2.close()
-    file3.close()
+    for name in names_list:
+        
+        name = name.strip()
+        #print(name)
+        # Check if the specified journal name exists in the loaded journal data
+        if name not in [journal['name'] for journal in journals]:
+            print(f"The journal '{name}' doesn't exist.")
+    
+    #data = pickle.load(open(r'data\journals\eLife\elif\info_ids.pkl', 'rb'))
+    # with open(r'data/unique_names.csv', 'r') as file:
+    #     unique_names = file.readlines()
+        
+    # # Split the lines into a 3 .txt files
+    # file1 = open(r'data/unique_names1.txt', 'w')
+    # file2 = open(r'data/unique_names2.txt', 'w')
+    # file3 = open(r'data/unique_names3.txt', 'w')
+    # count  = len(unique_names)
+    # for i in range(count):
+    #     if i < count/3:
+    #         file1.write(unique_names[i])
+    #     elif i < 2*count/3:
+    #         file2.write(unique_names[i])
+    #     else:
+    #         file3.write(unique_names[i])
+    # file1.close()
+    # file2.close()
+    # file3.close()
     
     # Load the model
     # with open('info_ids.pkl', 'rb') as file:
