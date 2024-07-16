@@ -1,6 +1,6 @@
 import pickle
 import pandas as pd
-from tqdm import tqdm
+#from tqdm import tqdm
 
 
 
@@ -28,8 +28,8 @@ def unique_mail(df: pd.DataFrame):
 
 if __name__ == '__main__':
     # Load the model
-    with open('data/info_ids.pkl', 'rb') as file:
-        model = pickle.load(file)
+    # with open('data/info_ids.pkl', 'rb') as file:
+    #     model = pickle.load(file)
     
     #print(model[0].keys())
      
@@ -39,7 +39,9 @@ if __name__ == '__main__':
     
     with open('data/info_journals.pkl', 'rb') as file:
         info_j = pickle.load(file)
-        
+     
+     
+    print(info_j[0].keys())   
     
     # # a =  [x["name"] for x in info_j]
     
@@ -53,12 +55,12 @@ if __name__ == '__main__':
     
     
     # Load a dataframe in csv file with headers
-    df = pd.read_csv('data/journals_results_filtered.csv')
+    # df = pd.read_csv('data/journals_results_filtered.csv')
 
 
-    mails = pd.read_csv('data\mails.csv')
+    # mails = pd.read_csv('data\mails.csv')
                 
-    print(len(mails['mails'].unique()))
+    # print(len(mails['mails'].unique()))
     
     
     # Count the unique values in the Mail column, the Mail column is a list
@@ -72,4 +74,4 @@ if __name__ == '__main__':
     
     # df.to_csv('data/journals_results_filtered.csv', index=False)
     
-   
+    
