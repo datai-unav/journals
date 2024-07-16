@@ -138,7 +138,7 @@ def process_journal_by_name(journals, journal_name, processed_file, errors_file,
     # Check if ID is already processed
     if num in progress["processed_nums"]:
         print(f"Article {num} already processed.")
-        return
+        return 5
     
     url = 'https://pubmed.ncbi.nlm.nih.gov/' + str(num) + '/?format=pubmed'
     print(f'{e}: {url}')
@@ -207,8 +207,11 @@ if __name__ == '__main__':
             # Process each ID individually
             for id_num in id_list:
                 # Call process_journal_by_name() for each ID
-                time.sleep(2)
-                process_journal_by_name(journals, name, args.processed_file, args.errors_file, args.data_file, id_num)
+                
+                flag = process_journal_by_name(journals, name, args.processed_file, args.errors_file, args.data_file, id_num)
+                
+                if flag != 5:
+                    time.sleep(1)
                 
                 # Verify the content of the info_ids.pkl after each save
                 saved_data = load_data(args.data_file, name)
