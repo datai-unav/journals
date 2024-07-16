@@ -211,7 +211,7 @@ if __name__ == '__main__':
                 flag = process_journal_by_name(journals, name, args.processed_file, args.errors_file, args.data_file, id_num)
                 
                 if flag != 5:
-                    time.sleep(1)
+                    time.sleep(2)
                 
                 # Verify the content of the info_ids.pkl after each save
                 saved_data = load_data(args.data_file, name)
