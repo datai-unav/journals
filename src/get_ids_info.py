@@ -191,13 +191,15 @@ if __name__ == '__main__':
         
     for name in names_list:
         
-        if not os.path.exists(f'data/journals/{name}'):
-            os.makedirs(f'data/journals/{name}')
-            
+        name = name.strip()
+        
         # Check if the specified journal name exists in the loaded journal data
         if name not in [journal['name'] for journal in journals]:
             print(f"The journal '{name}' doesn't exist.")
         else:
+            
+            if not os.path.exists(f'data/journals/{name}'):
+                os.makedirs(f'data/journals/{name}')
             # Obtain the list of IDs for the specified journal
             journal_info = next(journal for journal in journals if journal['name'] == name)
             id_list = journal_info.get('additional_info', [])
@@ -213,6 +215,6 @@ if __name__ == '__main__':
             
             with open(f'data/journals/{name}/finished.txt', 'w') as f:
                 f.write('Finished processing all IDs.')
-
+        break
 # cd 'Directorio_donde_se_encuentre_el_archivo'
 # python get_ids_info.py "Aphasiology"
